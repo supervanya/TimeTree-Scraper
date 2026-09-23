@@ -16,13 +16,13 @@ Install the pinned tools and dependencies with:
 
 ```bash
 mise install
-mise exec -- uv sync
+uv sync
 ```
 
 ## Setup
 
 ```bash
-mise exec -- uv run timetree-sync --help
+uv run timetree-sync --help
 ```
 
 The checked-in mise configuration manages the virtual environment and cache paths, so no manual
@@ -46,7 +46,7 @@ and `.state/` are excluded from Git.
 Run this once:
 
 ```bash
-mise exec -- uv run timetree-sync google-auth
+uv run timetree-sync google-auth
 ```
 
 The browser authorization stores a refreshable token at `.state/google-token.json` and prints all
@@ -57,13 +57,13 @@ writable calendars with their IDs.
 Always preview the first synchronization:
 
 ```bash
-mise exec -- uv run timetree-sync sync --dry-run
+uv run timetree-sync sync --dry-run
 ```
 
 Apply the same plan with:
 
 ```bash
-mise exec -- uv run timetree-sync sync
+uv run timetree-sync sync
 ```
 
 Each run fetches a fresh TimeTree snapshot before diffing Google Calendar. Creates are retry-safe,
@@ -75,7 +75,7 @@ updates are idempotent, and deletions apply only to events previously created by
 The safest initial run is interactive:
 
 ```bash
-mise exec -- uv run timetree-sync extract
+uv run timetree-sync extract
 ```
 
 You will be prompted for your TimeTree email, password, and calendar selection. The password is
@@ -98,7 +98,7 @@ event with multiple assignees is excluded if any one of them is listed.
 After identifying the calendar code, future runs can avoid the calendar prompt:
 
 ```bash
-mise exec -- uv run timetree-sync extract \
+uv run timetree-sync extract \
   --email you@example.com \
   --calendar-code your_calendar_code
 ```
@@ -109,9 +109,9 @@ risk. Without it, TimeTree Exporter prompts on each run.
 ## Tests and formatting
 
 ```bash
-mise exec -- uv run pytest
-mise exec -- uv run ruff check .
-mise exec -- uv run ruff format --check .
+uv run pytest
+uv run ruff check .
+uv run ruff format --check .
 ```
 
 TimeTree Exporter uses unofficial TimeTree web APIs. Those endpoints may change, so synchronization
