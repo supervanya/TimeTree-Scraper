@@ -24,6 +24,8 @@ class SourceEvent:
     last_modified: datetime | None = None
     recurrence: tuple[str, ...] = ()
     related_to: str | None = None
+    color: str | None = None
+    assignees: tuple[str, ...] = ()
 
     @property
     def all_day(self) -> bool:

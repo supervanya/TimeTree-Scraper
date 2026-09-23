@@ -3,5 +3,5 @@ python = "3.13.15"
 uv = "0.12.17"
 
 [env]
-UV_CACHE_DIR = ".state/uv-cache"
+UV_CACHE_DIR = "uv-cache"
 UV_PROJECT_ENVIRONMENT = "venv"

@@ -1,3 +1,5 @@
+import json
+from datetime import UTC, datetime
 from pathlib import Path
 from subprocess import CompletedProcess
 
@@ -16,15 +18,51 @@ def test_extract_uses_temporary_snapshot(monkeypatch: pytest.MonkeyPatch, tmp_pa
 
     def fake_run(command, **_kwargs):
         temporary_output = Path(command[command.index("--output") + 1])
+        raw_output = Path(command[command.index("--raw-output-dir") + 1])
         temporary_output.write_bytes((FIXTURES / "sample.ics").read_bytes())
+        (raw_output / "calendar_1").mkdir()
+        (raw_output / "calendars.json").write_text(
+            json.dumps(
+                {
+                    "calendars": [
+                        {
+                            "alias_code": "calendar-code",
+                            "calendar_users": [{"user_id": 7, "name": "Hazel"}],
+                        }
+                    ]
+                }
+            )
+        )
+        (raw_output / "calendar_1" / "events.json").write_text(
+            json.dumps(
+                {
+                    "events": [
+                        {
+                            "uuid": "all-day-event-uuid",
+                            "relationships": {
+                                "attendees": {"data": [{"id": "1,7", "type": "user"}]}
+                            },
+                        }
+                    ]
+                }
+            )
+        )
         assert temporary_output != output
         return CompletedProcess(command, 0)
 
     monkeypatch.setattr("subprocess.run", fake_run)
 
-    result = extract_calendar(output, calendar_code="calendar-code", email="user@example.com")
+    result = extract_calendar(
+        output,
+        calendar_code="calendar-code",
+        email="user@example.com",
+        now=datetime(2026, 9, 30, tzinfo=UTC),
+    )
 
     assert len(result.events) == 2
+    vacation = next(event for event in result.events if event.source_uid == "all-day-event-uuid")
+    assert vacation.summary == "Hazel: Vacation"
+    assert vacation.assignees == ("Hazel",)
     assert output.is_file()
 
 
