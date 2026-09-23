@@ -2,6 +2,8 @@
 
 One-way synchronization from a TimeTree calendar to a specific Google Calendar.
 
+I built this because we were trying to move away from TimeTree to Skylight. By scraping everything out of TimeTree and preserving assignees and colors, we were able to import this Google Calendar within Skylight and have all of our events preserved. Unfortunately, assignees will not work because every event inside Skylight is treated as an individual Skylight user and there is no open API for Skylight. There are community reverse-engineered packages, but since this was a good enough solution, we decided to stop here.
+
 The project wraps [`timetree-exporter`](https://github.com/eoleedi/TimeTree-Exporter), keeps only
 active and future events, and mirrors them into a specific Google Calendar. Only Google events
 tagged as managed by this project are updated or deleted.
