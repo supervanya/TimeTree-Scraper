@@ -196,7 +196,8 @@ def _print_plan(plan) -> None:
     )
     for action in plan.actions:
         if action.operation != "unchanged":
-            print(f"  {action.operation:>6}  {action.summary}")
+            when = (action.start or "no date")[:16].replace("T", " ")
+            print(f"  {action.operation:>6}  {when:<16}  {action.summary}")
 
 
 def _run_sync(args: argparse.Namespace) -> int:

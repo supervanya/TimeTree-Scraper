@@ -7,7 +7,7 @@ NAME_ALIASES = {
 
 # Events assigned to any of these people are omitted from Google Calendar.
 EXCLUDED_ASSIGNEES = {
-    "Britani"
+    # "Britani"
 }
 
 

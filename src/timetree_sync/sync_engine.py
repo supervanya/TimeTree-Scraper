@@ -30,6 +30,7 @@ class SyncAction:
     summary: str
     body: dict | None = None
     google_event_id: str | None = None
+    start: str | None = None
 
 
 @dataclass(frozen=True)
@@ -47,6 +48,11 @@ def _projection(body: dict) -> dict:
 def _body_hash(body: dict) -> str:
     encoded = json.dumps(_projection(body), sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _start_label(event: dict) -> str | None:
+    start = event.get("start") or {}
+    return start.get("dateTime") or start.get("date")
 
 
 def _private_properties(event: dict) -> dict:
@@ -92,7 +98,13 @@ def build_sync_plan(
             create_body = dict(body)
             create_body["id"] = deterministic_google_id(source.source_uid)
             actions.append(
-                SyncAction("create", source.source_uid, source.summary, body=create_body)
+                SyncAction(
+                    "create",
+                    source.source_uid,
+                    source.summary,
+                    body=create_body,
+                    start=_start_label(body),
+                )
             )
         elif _private_properties(existing).get("sourceHash") != body["extendedProperties"][
             "private"
@@ -104,6 +116,7 @@ def build_sync_plan(
                     source.summary,
                     body=body,
                     google_event_id=existing["id"],
+                    start=_start_label(body),
                 )
             )
         else:
@@ -113,6 +126,7 @@ def build_sync_plan(
                     source.source_uid,
                     source.summary,
                     google_event_id=existing["id"],
+                    start=_start_label(body),
                 )
             )
 
@@ -123,6 +137,7 @@ def build_sync_plan(
                     source.source_uid,
                     duplicate.get("summary") or source.summary,
                     google_event_id=duplicate["id"],
+                    start=_start_label(duplicate),
                 )
             )
 
@@ -134,6 +149,7 @@ def build_sync_plan(
                     source_uid,
                     existing.get("summary") or "(untitled)",
                     google_event_id=existing["id"],
+                    start=_start_label(existing),
                 )
             )
     return SyncPlan(tuple(actions))
